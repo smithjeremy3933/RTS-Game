@@ -1,4 +1,6 @@
-﻿using RTS.Movement;
+﻿using RTS.Combat;
+using RTS.Movement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,20 +10,129 @@ namespace RTS.Control
 {
     public class PlayerController : MonoBehaviour
     {
-        List<GameObject> selectedUnitList;
+        public GameObject hoveredObject;
+        public List<GameObject> SelectedUnitList;
         [SerializeField] List<GameObject> playerUnits = new List<GameObject>();
+
         Vector3 p1;
         bool dragSelect;
         SelectionDict selectedTable;
+        float maxRayDist = 1000f;
+        int screenHeight = 1080;
+        int dragControl = 40;
 
         private void Awake()
         {
-            selectedUnitList = new List<GameObject>();
+            SelectedUnitList = new List<GameObject>();
             dragSelect = false;
             selectedTable = GetComponent<SelectionDict>();
         }
 
         private void Update()
+        {
+            CheckCursor();
+            if (InteractWithCombat()) return;
+            InteractWithMovement();
+            SelectionDrag();
+        }
+
+        private void CheckCursor()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+            LayerMask mask = LayerMask.GetMask("Unit");
+            bool hasHit = Physics.Raycast(ray, out hitInfo, maxRayDist, mask);
+
+            if (hasHit)
+            {
+                GameObject hitObject = hitInfo.transform.root.gameObject;
+
+                HoveredObject(hitObject);
+            }
+            else
+            {
+                ClearSelection();
+            }
+        }
+
+        private static Ray GetMouseRay()
+        {
+            return Camera.main.ScreenPointToRay(Input.mousePosition);
+        }
+
+        private bool InteractWithCombat()
+        {
+            RaycastHit[] hits = Physics.RaycastAll(GetMouseRay());
+            foreach (RaycastHit hit in hits)
+            {
+                CombatTarget target = hit.transform.GetComponent<CombatTarget>();
+                if (target == null) continue;
+
+                if (Input.GetMouseButton(1))
+                {
+                    foreach (GameObject unit in SelectedUnitList)
+                    {
+                        IUnit currentUnit = unit.GetComponent<IUnit>();
+                        if (currentUnit.IsSelected())
+                        {
+                            unit.GetComponent<Fighter>().Attack(target.gameObject);
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void InteractWithMovement()
+        {
+            RaycastHit hit;
+            bool hasHit = Physics.Raycast(GetMouseRay(), out hit);
+            foreach (GameObject unit in SelectedUnitList)
+            {
+                Mover selectedUnit = unit.GetComponent<Mover>();
+                if (selectedUnit != null)
+                {
+                    if (selectedUnit.IsSelected())
+                    {
+                        if (hasHit)
+                        {
+                            if (Input.GetMouseButtonDown(1))
+                            {
+                                selectedUnit.StartMoveAction(hit.point);
+                            }
+                        }
+                    }
+                }             
+                else
+                {
+                    Debug.Log("Not selected");
+                }
+            }
+        }
+
+        void HoveredObject(GameObject obj)
+        {
+            if (hoveredObject != null)
+            {
+                if (obj == hoveredObject)
+                    return;
+
+                ClearSelection();
+            }
+
+            hoveredObject = obj;
+        }
+
+        void ClearSelection()
+        {
+            if (hoveredObject == null)
+                return;
+
+            hoveredObject = null;
+        }
+
+        private void SelectionDrag()
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -30,7 +141,7 @@ namespace RTS.Control
 
             if (Input.GetMouseButton(0))
             {
-                if ((p1 - Input.mousePosition).magnitude > 40)
+                if ((p1 - Input.mousePosition).magnitude > dragControl)
                 {
                     dragSelect = true;
                 }
@@ -38,7 +149,7 @@ namespace RTS.Control
 
             if (Input.GetMouseButtonUp(0))
             {
-                selectedUnitList.Clear();
+                SelectedUnitList.Clear();
 
                 if (!dragSelect)
                 {
@@ -54,20 +165,18 @@ namespace RTS.Control
 
         private void EndPointSelect()
         {
-            Ray ray = Camera.main.ScreenPointToRay(p1);
-            RaycastHit hit;
-            LayerMask mask = LayerMask.GetMask("Unit");
-            bool hasHit = Physics.Raycast(ray, out hit, 1000f, mask);
-            if (hasHit)
+            if (hoveredObject != null && playerUnits.Contains(hoveredObject))
             {
                 if (Input.GetKey(KeyCode.LeftShift)) // Inclusive Select
                 {
-                    selectedTable.AddSelected(hit.transform.gameObject);
+                    selectedTable.AddSelected(hoveredObject);
                 }
                 else // Exclusive Select
                 {
                     selectedTable.DeselectAll();
-                    selectedTable.AddSelected(hit.transform.gameObject);
+                    SelectedUnitList.Clear();
+                    selectedTable.AddSelected(hoveredObject);
+                    SelectedUnitList.Add(hoveredObject);
                 }
             }
             else
@@ -79,6 +188,7 @@ namespace RTS.Control
                 else
                 {
                     selectedTable.DeselectAll();
+                    SelectedUnitList.Clear();
                 }
             }
         }
@@ -86,18 +196,17 @@ namespace RTS.Control
         private void EndDragSelect()
         {
             Rect rect = Utils.GetScreenRect(p1, Input.mousePosition);
-            var yMin = 1080 - rect.yMax;
-            var yMax = 1080 - rect.yMin;
+            var yMin = screenHeight - rect.yMax;
+            var yMax = screenHeight - rect.yMin;
             selectedTable.DeselectAll();
 
             foreach (GameObject unit in playerUnits)
             {
-                //GameObject go = unit.transform.parent.gameObject;
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(unit.transform.position);
 
                 if (screenPos.x > rect.xMin && screenPos.x < rect.xMax && (screenPos.y) > (yMin - 20) && (screenPos.y) < yMax)
                 {
-                    selectedUnitList.Add(unit);
+                    SelectedUnitList.Add(unit);
                     selectedTable.AddSelected(unit);
                 }
             }
@@ -106,7 +215,7 @@ namespace RTS.Control
             //    selectedTable.DeselectAll();
             //}
 
-            Debug.Log(selectedUnitList.Count);
+            Debug.Log(SelectedUnitList.Count);
         }
 
         private void OnGUI()

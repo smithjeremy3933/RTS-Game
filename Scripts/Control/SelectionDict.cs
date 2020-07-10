@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using RTS.Combat;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,21 @@ namespace RTS.Control
     public class SelectionDict : MonoBehaviour
     {
         public Dictionary<int, GameObject> selectedTable = new Dictionary<int, GameObject>();
+
+        private void Start()
+        {
+            Health.OnPlayerDeath += Health_OnPlayerDeath;
+        }
+
+        private void Health_OnPlayerDeath(object sender, Health.OnPlayerDeathEventArgs e)
+        {
+            PlayerController playerController = FindObjectOfType<PlayerController>();
+            if (playerController.SelectedUnitList.Contains(e.gameObject))
+            {
+                playerController.SelectedUnitList.Remove(e.gameObject);
+            }
+
+        }
 
         public void AddSelected(GameObject go)
         {

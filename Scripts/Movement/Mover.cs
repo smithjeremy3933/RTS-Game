@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using RTS.Control;
+using RTS.Core;
 
 namespace RTS.Movement
 {
-    public class Mover : MonoBehaviour
+    public class Mover : MonoBehaviour, IUnit, IAction
     {
         [SerializeField] float maxSpeed = 10f;
 
@@ -23,34 +24,27 @@ namespace RTS.Movement
             id = go.GetInstanceID();
         }
 
-        private void Update()
+        public void StartMoveAction(Vector3 destination)
         {
-            if (Input.GetMouseButtonDown(1))
-            {
-                bool isSelected = selectedTable.Contains(id);
-                Debug.Log(isSelected + " " + id);
-                if (isSelected)
-                {
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    RaycastHit hit;
-                    bool hasHit = Physics.Raycast(ray, out hit);
-                    if (hasHit)
-                    {
-                        MoveTo(hit.point, 10f);
-                    }
-                }
-                else
-                {
-                    Debug.Log("Not selected");
-                }
-            }
+            GetComponent<ActionScheduler>().StartAction(this);
+            MoveTo(destination, maxSpeed);
         }
 
-        void MoveTo(Vector3 destination, float speedFraction)
+        public bool IsSelected()
+        {
+            return selectedTable.Contains(id);
+        }
+
+        public void MoveTo(Vector3 destination, float speedFraction)
         {
             navMeshAgent.destination = destination;
             navMeshAgent.speed = maxSpeed * Mathf.Clamp01(speedFraction);
             navMeshAgent.isStopped = false;
+        }
+
+        public void Cancel()
+        {
+            navMeshAgent.isStopped = true;
         }
     }
 }
