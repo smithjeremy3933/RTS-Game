@@ -1,4 +1,5 @@
 ﻿using RTS.Combat;
+using RTS.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +22,10 @@ namespace RTS.Control
             {
                 playerController.SelectedUnitList.Remove(e.gameObject);
             }
-
+            if (playerController.PlayerUnits.Contains(e.gameObject))
+            {
+                playerController.PlayerUnits.Remove(e.gameObject);
+            }
         }
 
         public void AddSelected(GameObject go)

@@ -12,7 +12,7 @@ namespace RTS.Control
     {
         public GameObject hoveredObject;
         public List<GameObject> SelectedUnitList;
-        [SerializeField] List<GameObject> playerUnits = new List<GameObject>();
+        [SerializeField] public List<GameObject> PlayerUnits = new List<GameObject>();
 
         Vector3 p1;
         bool dragSelect;
@@ -165,7 +165,7 @@ namespace RTS.Control
 
         private void EndPointSelect()
         {
-            if (hoveredObject != null && playerUnits.Contains(hoveredObject))
+            if (hoveredObject != null && PlayerUnits.Contains(hoveredObject))
             {
                 if (Input.GetKey(KeyCode.LeftShift)) // Inclusive Select
                 {
@@ -200,7 +200,7 @@ namespace RTS.Control
             var yMax = screenHeight - rect.yMin;
             selectedTable.DeselectAll();
 
-            foreach (GameObject unit in playerUnits)
+            foreach (GameObject unit in PlayerUnits)
             {
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(unit.transform.position);
 

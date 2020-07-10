@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RTS.Combat
+namespace RTS.Core
 {
     public class Health : MonoBehaviour
     {
@@ -26,6 +26,7 @@ namespace RTS.Combat
             print(health);
             if (health == 0)
             {
+                GetComponent<ActionScheduler>().CancelCurrentAction();
                 OnPlayerDeath?.Invoke(this, new OnPlayerDeathEventArgs { gameObject = gameObject });
                 Destroy(gameObject);
             }

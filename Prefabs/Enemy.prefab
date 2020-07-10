@@ -24,7 +24,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c67eb7a07e9b49c48a0dd4bd7a2f19e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseDistance: 5
+  chaseDistance: 10
+  suspicionTime: 3
+  patrolPath: {fileID: 0}
+  waypointTolerance: 1
 --- !u!1001 &7260214954193012701
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -96,6 +99,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 2834973050277586755, guid: f40a6d237b65db7498b076174b5d0243,
+        type: 3}
+      propertyPath: maxSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7828856966269447506, guid: f40a6d237b65db7498b076174b5d0243,
+        type: 3}
+      propertyPath: m_Speed
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7828856966269447506, guid: f40a6d237b65db7498b076174b5d0243,
+        type: 3}
+      propertyPath: m_Acceleration
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7828856966269447506, guid: f40a6d237b65db7498b076174b5d0243,
+        type: 3}
+      propertyPath: m_AngularSpeed
+      value: 5000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f40a6d237b65db7498b076174b5d0243, type: 3}

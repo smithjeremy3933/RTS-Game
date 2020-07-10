@@ -14,7 +14,7 @@ namespace RTS.Combat
         [SerializeField] float damage = 5f;
 
         Transform target;
-        float timeSinceLastAttack = 0;
+        float timeSinceLastAttack = Mathf.Infinity;
 
         private void Update()
         {
@@ -48,6 +48,16 @@ namespace RTS.Combat
                     health.TakeDamage(damage);
                 }
             }
+        }
+
+        public bool CanAttack(GameObject combatTarget)
+        {
+            if (combatTarget == null)
+            {
+                return false;
+            }
+            else
+                return true;
         }
 
         public void Attack(GameObject combatTarget)
