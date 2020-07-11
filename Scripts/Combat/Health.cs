@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using RTS.Stats;
+using System;
 using UnityEngine;
 
 namespace RTS.Core
@@ -17,7 +16,7 @@ namespace RTS.Core
 
         private void Start()
         {
-
+            health = GetComponent<BaseStats>().GetHealth();
         }
 
         public void TakeDamage(float damage)
@@ -32,5 +31,9 @@ namespace RTS.Core
             }
         }
        
+        public float GetPercentage()
+        {
+            return 100 * (health / GetComponent<BaseStats>().GetHealth());
+        }
     }
 }

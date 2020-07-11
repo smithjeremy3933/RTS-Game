@@ -1,8 +1,5 @@
 ﻿using RTS.Core;
 using RTS.Movement;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RTS.Combat

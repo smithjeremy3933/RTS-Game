@@ -1,18 +1,16 @@
 ﻿using RTS.Combat;
 using RTS.Movement;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace RTS.Control
 {
     public class PlayerController : MonoBehaviour
     {
-        public GameObject hoveredObject;
-        public List<GameObject> SelectedUnitList;
         [SerializeField] public List<GameObject> PlayerUnits = new List<GameObject>();
+        public GameObject hoveredObject;
+        public List<GameObject> SelectedUnitList = new List<GameObject>();
 
         Vector3 p1;
         bool dragSelect;
@@ -23,7 +21,6 @@ namespace RTS.Control
 
         private void Awake()
         {
-            SelectedUnitList = new List<GameObject>();
             dragSelect = false;
             selectedTable = GetComponent<SelectionDict>();
         }
@@ -216,6 +213,15 @@ namespace RTS.Control
             //}
 
             Debug.Log(SelectedUnitList.Count);
+        }
+
+        public bool IsSelectListEmpty()
+        {
+            if (SelectedUnitList.Count > 0)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void OnGUI()

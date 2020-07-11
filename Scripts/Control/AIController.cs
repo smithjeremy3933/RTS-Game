@@ -1,8 +1,6 @@
 ﻿using RTS.Combat;
 using RTS.Core;
 using RTS.Movement;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,6 +13,7 @@ namespace RTS.Control
         [SerializeField] float suspicionTime = 3f;
         [SerializeField] PatrolPath patrolPath;
         [SerializeField] float waypointTolerance = 1f;
+        [SerializeField] float waypointDwellTime = 3f;
 
         Fighter fighter;
         Health health;
@@ -22,6 +21,7 @@ namespace RTS.Control
         List<Player> players = new List<Player>();
         Player closestPlayer = null;
         float timeSinceLastSawPlayer = Mathf.Infinity;
+        float timeSinceArrivedAtWaypoint = Mathf.Infinity;
         int currentWaypointIndex = 0;
         Vector3 guardPos;
 
@@ -40,7 +40,6 @@ namespace RTS.Control
 
             if (InAttackRangeOfPlayer() && fighter.CanAttack(closestPlayer.gameObject))
             {
-                timeSinceLastSawPlayer = 0;
                 AttackBehavior();
             }
             else if (timeSinceLastSawPlayer < suspicionTime)
@@ -52,7 +51,13 @@ namespace RTS.Control
                 PatrolBehavior();
             }
 
+            UpdateTimers();
+        }
+
+        private void UpdateTimers()
+        {
             timeSinceLastSawPlayer += Time.deltaTime;
+            timeSinceArrivedAtWaypoint += Time.deltaTime;
         }
 
         private bool InAttackRangeOfPlayer()
@@ -72,6 +77,7 @@ namespace RTS.Control
 
         private void AttackBehavior()
         {
+            timeSinceLastSawPlayer = 0;
             fighter.Attack(closestPlayer.gameObject);
         }
 
@@ -87,11 +93,17 @@ namespace RTS.Control
             {
                 if (AtWayPoint())
                 {
+                    timeSinceArrivedAtWaypoint = 0;
                     CycleWaypoint();
                 }
                 nextPos = GetCurrentWaypoint();
             }
-            mover.StartMoveAction(nextPos);
+
+            if (timeSinceArrivedAtWaypoint > waypointDwellTime)
+            {
+                mover.StartMoveAction(nextPos);
+            }
+
             closestPlayer = null;
         }
 

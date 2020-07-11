@@ -1,6 +1,4 @@
-﻿using RTS.Combat;
-using RTS.Core;
-using System.Collections;
+﻿using RTS.Core;
 using System.Collections.Generic;
 using UnityEngine;
 
