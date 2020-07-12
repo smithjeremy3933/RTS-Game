@@ -1,4 +1,5 @@
 ﻿using RTS.Combat;
+using RTS.Core;
 using RTS.Movement;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace RTS.Control
         Vector3 p1;
         bool dragSelect;
         SelectionDict selectedTable;
+        HealthDisplay healthDisplay;
+        ExperienceDisplay experienceDisplay;
         float maxRayDist = 1000f;
         int screenHeight = 1080;
         int dragControl = 40;
@@ -23,6 +26,8 @@ namespace RTS.Control
         {
             dragSelect = false;
             selectedTable = GetComponent<SelectionDict>();
+            healthDisplay = FindObjectOfType<HealthDisplay>();
+            experienceDisplay = FindObjectOfType<ExperienceDisplay>();
         }
 
         private void Update()
@@ -170,10 +175,7 @@ namespace RTS.Control
                 }
                 else // Exclusive Select
                 {
-                    selectedTable.DeselectAll();
-                    SelectedUnitList.Clear();
-                    selectedTable.AddSelected(hoveredObject);
-                    SelectedUnitList.Add(hoveredObject);
+                    ExclusiveSelect();
                 }
             }
             else
@@ -186,6 +188,7 @@ namespace RTS.Control
                 {
                     selectedTable.DeselectAll();
                     SelectedUnitList.Clear();
+                    ClearDisplay();
                 }
             }
         }
@@ -195,6 +198,7 @@ namespace RTS.Control
             Rect rect = Utils.GetScreenRect(p1, Input.mousePosition);
             var yMin = screenHeight - rect.yMax;
             var yMax = screenHeight - rect.yMin;
+            ClearDisplay();
             selectedTable.DeselectAll();
 
             foreach (GameObject unit in PlayerUnits)
@@ -207,12 +211,30 @@ namespace RTS.Control
                     selectedTable.AddSelected(unit);
                 }
             }
-            //if (!Input.GetKey(KeyCode.LeftShift))
-            //{
-            //    selectedTable.DeselectAll();
-            //}
-
             Debug.Log(SelectedUnitList.Count);
+            SetDisplay();
+        }
+
+        private void ExclusiveSelect()
+        {
+            selectedTable.DeselectAll();
+            SelectedUnitList.Clear();
+            ClearDisplay();
+            selectedTable.AddSelected(hoveredObject);
+            SelectedUnitList.Add(hoveredObject);
+            SetDisplay();
+        }
+
+        private void SetDisplay()
+        {
+            healthDisplay.SetInitHealthText();
+            experienceDisplay.SetInitExpText();
+        }
+
+        private void ClearDisplay()
+        {
+            healthDisplay.ClearHealthText();
+            experienceDisplay.ClearExpText();
         }
 
         public bool IsSelectListEmpty()

@@ -42,7 +42,7 @@ namespace RTS.Combat
                 Health health = target.GetComponent<Health>();
                 if (health != null)
                 {
-                    health.TakeDamage(damage);
+                    health.TakeDamage(gameObject, damage);
                 }
             }
         }
