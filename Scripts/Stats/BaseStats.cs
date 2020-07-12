@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RTS.Core;
+using UnityEngine;
 
 namespace RTS.Stats
 {
@@ -9,10 +10,33 @@ namespace RTS.Stats
         [SerializeField] CharacterClass characterClass;
         [SerializeField] Progression progression = null;
 
+        private void Update()
+        {
+
+        }
+
         public float GetStat(Stat stat)
         {
-            return progression.GetStat(stat, characterClass, startingLevel);
+            return progression.GetStat(stat, characterClass, CalculateLevel());
+        }
+
+        public int CalculateLevel()
+        {
+            Experience experience = GetComponent<Experience>();
+
+            if (experience == null) return startingLevel;
+
+            float currentExp = experience.GetPoints();
+            int maxLevel = progression.GetLevels(Stat.ExpToLevelUp, characterClass);
+            for (int level = 0; level <= maxLevel; level++)
+            {
+                float ExpToLevelUp = progression.GetStat(Stat.ExpToLevelUp, characterClass, level);
+                if (ExpToLevelUp > currentExp)
+                {
+                    return level;
+                }
+            }
+            return maxLevel + 1;
         }
     }
-
 }
