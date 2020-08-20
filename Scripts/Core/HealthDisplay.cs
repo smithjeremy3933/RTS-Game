@@ -30,7 +30,7 @@ namespace RTS.Core
             if (e.gameObject.GetComponent<IUnit>().IsSelected())
             {
                 Text healthText = GoTextMap[e.gameObject];
-                healthText.text = e.gameObject.GetComponent<Health>().GetPercentage() + "%";
+                healthText.text = e.gameObject.GetComponent<Health>().GetPercentage().ToString("F1") + "%";
             }
         }
 
@@ -49,7 +49,7 @@ namespace RTS.Core
                         {
                             GoTextMap[unit] = healthSlots[i];
                             GoIndexTextMap[unit] = i;
-                            healthSlots[i].text = currentHealth + "%";
+                            healthSlots[i].text = currentHealth.ToString("F1") + "%";
                             break;
                         }
                     }
