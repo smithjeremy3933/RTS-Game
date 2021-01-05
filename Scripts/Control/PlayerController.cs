@@ -188,7 +188,6 @@ namespace RTS.Control
                 {
                     selectedTable.DeselectAll();
                     SelectedUnitList.Clear();
-                    ClearDisplay();
                 }
             }
         }
@@ -198,7 +197,6 @@ namespace RTS.Control
             Rect rect = Utils.GetScreenRect(p1, Input.mousePosition);
             var yMin = screenHeight - rect.yMax;
             var yMax = screenHeight - rect.yMin;
-            ClearDisplay();
             selectedTable.DeselectAll();
 
             foreach (GameObject unit in PlayerUnits)
@@ -212,17 +210,14 @@ namespace RTS.Control
                 }
             }
             Debug.Log(SelectedUnitList.Count);
-            SetDisplay();
         }
 
         private void ExclusiveSelect()
         {
             selectedTable.DeselectAll();
             SelectedUnitList.Clear();
-            ClearDisplay();
             selectedTable.AddSelected(hoveredObject);
             SelectedUnitList.Add(hoveredObject);
-            SetDisplay();
         }
 
         private void SetDisplay()
