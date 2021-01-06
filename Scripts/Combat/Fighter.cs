@@ -38,6 +38,7 @@ namespace RTS.Combat
             if (timeSinceLastAttack > timeBetweenAttacks)
             {
                 print("Attack Enemy!");
+                TriggerAttack();
                 timeSinceLastAttack = 0;
                 Health health = target.GetComponent<Health>();
                 if (health != null)
@@ -65,7 +66,20 @@ namespace RTS.Combat
 
         public void Cancel()
         {
+            StopAttack();
             target = null;
+        }
+
+        private void TriggerAttack()
+        {
+            GetComponent<Animator>().ResetTrigger("stopAttack");
+            GetComponent<Animator>().SetTrigger("attack");
+        }
+
+        private void StopAttack()
+        {
+            GetComponent<Animator>().ResetTrigger("attack");
+            GetComponent<Animator>().SetTrigger("stopAttack");
         }
     }
 }

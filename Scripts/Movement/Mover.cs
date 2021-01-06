@@ -32,6 +32,8 @@ namespace RTS.Movement
             Vector3 velocity = navMeshAgent.velocity;
             Vector3 localVelocity = transform.InverseTransformDirection(velocity);
             float speed = localVelocity.z;
+            if (speed < 0.2)
+                speed = 0;
             GetComponent<Animator>().SetFloat("forwardSpeed", speed);
         }
 
